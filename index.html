@@ -781,8 +781,14 @@
     displayUpcomingMovies();
   }
 
-  // Modal űrlap megnyitása
+  // Modal űrlap megnyitása (közelgő film hozzáadása)
   function openUpcomingForm() {
+    // Űrlap mezők ürítése
+    document.getElementById("upcomingMovieTitle").value = "";
+    document.getElementById("upcomingMovieDate").value = "";
+    document.getElementById("upcomingMovieLink").value = "";
+    
+    // Űrlap megjelenítése
     document.getElementById("upcomingForm").style.display = "block";
   }
 
@@ -977,8 +983,15 @@
     displayMovies();
   }
 
-  // Modal űrlap megnyitása
+  // Modal űrlap megnyitása (film hozzáadása)
   function openForm() {
+    // Űrlap mezők ürítése
+    document.getElementById("movieTitle").value = "";
+    document.getElementById("movieImage").value = "";
+    document.getElementById("movieLink").value = "";
+    document.getElementById("movieGenre").value = "action"; // Visszaállítjuk az alapértelmezettre
+    
+    // Űrlap megjelenítése
     document.getElementById("movieForm").style.display = "block";
   }
 
