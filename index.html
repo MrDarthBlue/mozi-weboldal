@@ -304,11 +304,12 @@
         color: #ff6b6b;
         text-decoration: underline;
     }
-    /* Szűrő gombok stílusa */
+    /* Szűrő gombok stílusai */
     .filter-btn {
-      margin: 0 5px;
+      margin: 0 5px 8px 0 !important;
       transition: all 0.3s;
       border-radius: 4px;
+      padding: 6px 12px !important;
     }
 
     .filter-btn:hover {
@@ -320,6 +321,10 @@
       background-color: #f44336 !important;
       color: white !important;
       box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .w3-bar {
+      margin-bottom: 8px;
     }
 </style>
 </head>
@@ -425,6 +430,8 @@
       <button class="w3-button w3-black filter-btn" onclick="filterMovies('musical')">Musical</button>
       <button class="w3-button w3-black filter-btn" onclick="filterMovies('mystery')">Rejtély</button>
       <button class="w3-button w3-black filter-btn" onclick="filterMovies('historical')">Történelmi</button>
+      <button class="w3-button w3-black filter-btn" onclick="filterMovies('war')">Háborús</button>
+      <button class="w3-button w3-black filter-btn" onclick="filterMovies('western')">Western</button>
     </div>
     
     <p class="w3-center">Add hozzá a kedvenc filmjeidet, értékeld, képre kattintva nyisd meg az IMDB oldalát! </p>
