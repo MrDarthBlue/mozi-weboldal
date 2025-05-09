@@ -326,6 +326,40 @@
     .w3-bar {
       margin-bottom: 8px;
     }
+    
+    /* Rendezés szekció stílusai */
+    .sort-section {
+      margin: 20px 0;
+      padding: 15px;
+      background-color: #f5f5f5;
+      border-radius: 8px;
+    }
+    
+    .section-title {
+      margin-top: 0;
+      margin-bottom: 10px;
+      font-weight: bold;
+      color: #333;
+      font-size: 1.1em;
+    }
+
+    .sort-btn {
+      margin: 5px !important;
+      transition: all 0.3s;
+      border-radius: 4px;
+      padding: 6px 12px !important;
+      background-color: #4CAF50 !important;
+      color: white !important;
+    }
+
+    .sort-btn:hover {
+      background-color: #45a049 !important;
+    }
+
+    .sort-btn.active {
+      background-color: #388e3c !important;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
 </style>
 </head>
 
@@ -413,6 +447,7 @@
     
     <!-- Szűrő gombok hozzáadása -->
     <div class="w3-container w3-margin-bottom">
+      <div class="section-title">Szűrés kategóriák szerint</div>
       <div class="w3-bar">
         <button class="w3-button w3-black filter-btn active" onclick="filterMovies('all')">Összes</button>
         <button class="w3-button w3-black filter-btn" onclick="filterMovies('action')">Akció</button>
@@ -433,6 +468,19 @@
         <button class="w3-button w3-black filter-btn" onclick="filterMovies('historical')">Történelmi</button>
         <button class="w3-button w3-black filter-btn" onclick="filterMovies('war')">Háborús</button>
         <button class="w3-button w3-black filter-btn" onclick="filterMovies('western')">Western</button>
+      </div>
+    </div>
+    
+    <!-- Rendezési lehetőségek - elkülönített szekció -->
+    <div class="w3-container w3-margin-bottom">
+      <div class="section-title">Rendezési lehetőségek</div>
+      <div>
+        <button class="w3-button sort-btn" onclick="sortMovies('asc')">
+          <i class="fa fa-sort-alpha-asc"></i> Cím szerint növekvő
+        </button>
+        <button class="w3-button sort-btn" onclick="sortMovies('desc')">
+          <i class="fa fa-sort-alpha-desc"></i> Cím szerint csökkenő
+        </button>
       </div>
     </div>
     
@@ -479,6 +527,7 @@
           </select>
         </p>
       </div>
+
       <footer class="w3-container w3-teal">
         <button class="w3-button w3-white w3-border" onclick="saveMovie()">Mentés</button>
       </footer>
@@ -1006,7 +1055,41 @@
     displayUpcomingMovies();
     // Alapértelmezetten az "Összes" gomb aktív
     document.querySelector('.filter-btn').click();
+    // Alapértelmezett rendezés
+    sortMovies('asc');
   };
+  // Rendezés
+  function sortMovies(order) {
+    let movies = JSON.parse(localStorage.getItem("movies")) || [];
+    
+    // Filmek sorrendbe állítása
+    movies.sort((a, b) => {
+      const titleA = a.title.toLowerCase();
+      const titleB = b.title.toLowerCase();
+      
+      if (order === 'asc') {
+        return titleA.localeCompare(titleB);
+      } else {
+        return titleB.localeCompare(titleA);
+      }
+    });
+
+    // Rendezett lista mentése
+    localStorage.setItem("movies", JSON.stringify(movies));
+    
+    // Lista frissitése
+    displayMovies();
+    
+    // Aktív rendezés gomb frissítése
+    document.querySelectorAll('.sort-btn').forEach(btn => {
+      btn.classList.remove('active');
+      if (btn.getAttribute('onclick').includes(`'${order}'`)) {
+        btn.classList.add('active');
+      }
+    });
+  }
+  
+
 </script>
 
 </body>
