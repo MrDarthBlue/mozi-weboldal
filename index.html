@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <title>Beadandó</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+    body {font-family: "Lato", sans-serif}
+    .mySlides {
+        display: none;
+        animation: fade 1.5s ease-in-out;
+    }
+    @keyframes fade {
+        from {opacity: 0.4}
+        to {opacity: 1}
+    }
+
+    /* Slide szövegek stílusai - jobb láthatóság */
+    .w3-display-bottommiddle.w3-container {
+        background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.5) 100%);
+        padding: 2vw 4vw;
+        width: 100%;
+        backdrop-filter: blur(5px);
+        border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .w3-display-bottommiddle h3 {
+        font-size: clamp(18px, 2.5vw, 32px);
+        margin-bottom: 1vw;
+        color: white;
+        text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+    }
+
+    .w3-display-bottommiddle p {
+        font-size: clamp(12px, 1.2vw, 18px);
+        line-height: 1.5;
+        color: #f1f1f1;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        margin-bottom: 10px;
+    }
+
+    .w3-display-bottommiddle.w3-text-white {
+        color: #fff !important;
+        text-shadow: 0 0 10px rgba(0,0,0,0.8);
+    }
+
+    /* Mobil nézet optimalizálása */
+    @media (max-width: 768px) {
+        .w3-display-bottommiddle.w3-container {
+            padding: 15px;
+        }
+        .w3-display-bottommiddle h3 {
+            font-size: 18px;
+        }
+        .w3-display-bottommiddle p {
+            font-size: 14px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+    }
+
+    /* Új stílus a közelgő filmek listájához */
+    #upcomingMoviesList li {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 16px !important;
+    }
+    .upcoming-movie-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    /* Film kártyák stílusa */
+    .movie-card {
+        width: 200px;
+        margin: 10px;
+        display: inline-block;
+        vertical-align: top;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        transition: box-shadow 0.3s ease;
+        background-color: white;
+    }
+
+    .movie-card:hover {
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+    
+    .movie-poster-container {
+        width: 100%;
+        height: 300px;  
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .movie-poster {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s;
+    }
+    
+    .movie-poster:hover {
+        transform: scale(1.05);
+    }
+    
+    .movie-title {
+        margin: 8px 0;
+        font-weight: bold;
+    }
+    
+    /* A film container flex layoutra állítása */
+    #movieContainer {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .upcoming-movie-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .upcoming-movie-title {
+        color: #000;
+        text-decoration: none;
+        font-weight: bold;
+        margin-right: 15px;
+    }
+
+    .upcoming-movie-title:hover {
+        color: #f44336;
+        text-decoration: underline;
+    }
+
+    .upcoming-movie-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+  
+    /* Csillagos értékelés stílusa */
+    .rating {
+        margin: 5px 0;
+        display: flex;
+        justify-content: center;
+    }
+  
+    .rating-star {
+        cursor: pointer;
+        color: #ccc;
+        font-size: 20px;
+    }
+  
+    .rating-star:hover,
+    .rating-star.active {
+        color: #ffcc00;
+    }
+
+    /* Szereplők szekció stílusa */
+    #szereplok {
+        background-color: #f9f9f9;
+        padding: 80px 0;
+        text-align: center;
+    }
+
+    #szereplok h2 {
+        font-size: 2.5em;
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    #szereplok .w3-opacity {
+        font-size: 1.2em;
+        color: #666;
+        margin-bottom: 40px;
+    }
+
+    /* Kör alakú képek stílusa */
+    .circle-img {
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        background-size: cover;
+        background-position: center;
+        display: inline-block;
+        margin: 20px auto;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s, box-shadow 0.3s;
+        cursor: pointer;
+    }
+
+    .circle-img:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Szereplők nevei */
+    #szereplok h3 {
+        margin-top: 20px;
+        font-size: 1.5em;
+        color: #222;
+        cursor: pointer;
+        transition: color 0.3s;
+    }
+
+    #szereplok h3:hover {
+        color: #f44336;
+    }
+
+    /* Modal ablakok stílusa */
+    .w3-modal {
+        animation: fadeIn 0.3s;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    .w3-modal-content {
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .w3-modal-content h2 {
+        color: #333;
+    }
+
+    .w3-modal-content p {
+        margin: 10px 0;
+        color: #555;
+    }
+
+    .w3-light-grey {
+        background-color: #f1f1f1 !important;
+    }
+
+    /* Kapcsolat szekció stílusa */
+    #contact {
+        background-color: #111;  
+        color: white;
+        padding: 80px 0;
+        text-align: center;
+    }
+
+    #contact h2 {
+        font-size: 2.5em;
+        margin-bottom: 40px;
+        color: #fff;
+    }
+
+    .contact-container {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 30px;
+        margin-top: 40px;
+    }
+
+    .contact-card {
+        background-color: #222;
+        border-radius: 10px;
+        padding: 25px;
+        width: 250px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .contact-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+    }
+
+    .contact-icon {
+        font-size: 2.5em;
+        margin-bottom: 15px;
+        color: #f44336;  
+    }
+
+    .contact-info {
+        font-size: 1.1em;
+        line-height: 1.6;
+    }
+
+    .contact-info a {
+        color: #f44336;
+        text-decoration: none;
+        transition: color 0.3s;
+    }
+
+    .contact-info a:hover {
+        color: #ff6b6b;
+        text-decoration: underline;
+    }
+</style>
+</head>
+
+
+<body>
+
+<!-- Navigációs sáv -->
+<div class="w3-top">
+  <div class="w3-bar w3-black w3-card">
+    <a class="w3-bar-item w3-button w3-padding-large w3-hide-medium w3-hide-large w3-right" href="javascript:void(0)" onclick="myFunction()" title="Navigációs menü váltása"><i class="fa fa-bars"></i></a>
+    <a href="#" class="w3-bar-item w3-button w3-padding-large">Kezdőlap</a>
+    <a href="#movies" class="w3-bar-item w3-button w3-padding-large w3-hide-small">Filmek</a>
+    <a href="#upcoming" class="w3-bar-item w3-button w3-padding-large w3-hide-small">Közelgő</a>
+    <a href="#szereplok" class="w3-bar-item w3-button w3-padding-large w3-hide-small">Szereplők</a>
+    <a href="#contact" class="w3-bar-item w3-button w3-padding-large w3-hide-small">Kapcsolat</a>
+  </div>
+</div>
+
+<!-- Oldal tartalom -->
+<div class="w3-content" style="max-width:2000px;margin-top:46px">
+
+  <!-- Automatikus Diavetítés Képek -->
+  <div class="mySlides w3-display-container w3-center" style="position:relative; width:100%; padding-top:43%; overflow:hidden;">
+    <a href="https://www.imdb.com/title/tt0468569/" target="_blank">
+      <img src="https://images.ctfassets.net/4mws6uyas4ta/att1VD5AcXZTCsahB/4709f152e65850013f09f54d847f1816/The_Dark_Knight_-_0.jpg" style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover;">
+    </a>
+    <div class="w3-display-bottommiddle w3-container w3-text-white w3-padding-32 w3-hide-small" style="position:absolute; bottom:0; width:100%;">
+      <h3>A Sötét Lovag</h3>
+      <p><b>A Sötét Lovag (The Dark Knight) egy 2008-as amerikai szuperhősfilm, amelyet Christopher Nolan 
+        rendezett, és a DC Comics ikonikus karakterét, Batmant állítja a középpontba. A történet Gotham városában játszódik, 
+        ahol Batman (Christian Bale) rendíthetetlenül küzd a bűn ellen. Legnagyobb kihívója a kaotikus és kiszámíthatatlan Joker 
+        (Heath Ledger), aki anarchiát akar teremteni a városban. A film a jó és a rossz közti morális határvonalakat vizsgálja, 
+        miközben látványos akciójelenetekkel és mély karakterábrázolással nyűgözi le a nézőt. Heath Ledger alakítása posztumusz 
+        Oscar-díjat nyert, és a film a modern képregényfilmek egyik csúcspontjává vált.</b></p>   
+    </div>
+  </div>
+  <div class="mySlides w3-display-container w3-center" style="position:relative; width:100%; padding-top:43%; overflow:hidden;">
+    <a href="https://www.imdb.com/title/tt1630029/" target="_blank">
+      <img src="https://a-static.projektn.sk/2022/12/AwardsSeason956452-1960x1034.jpg" style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover;">
+    </a>
+    <div class="w3-display-bottommiddle w3-container w3-text-white w3-padding-32 w3-hide-small" style="position:absolute; bottom:0; width:100%;">
+      <h3>Avatar: A Víz Útja</h3>
+      <p><b>Avatar: A víz útja (Avatar: The Way of Water) James Cameron 2022-ben bemutatott sci-fi kalandfilmje, 
+        az Avatar (2009) folytatása. A történet több évvel az első rész után játszódik, és Jake Sully (Sam Worthington) immár a 
+        na'vik között él családjával együtt a Pandora bolygón. Amikor az emberek visszatérnek, hogy újra fenyegetést jelentsenek a világra, Jake és 
+        Neytiri (Zoe Saldaña) kénytelenek elhagyni otthonukat, és menedéket keresnek a vízi Metkayina törzsnél. A film látványos víz alatti világokat mutat be, 
+        miközben a család, az összetartozás és az identitás kérdéseit járja körül. Látványtechnikailag úttörő alkotás, és jelentős sikert aratott világszerte.</b></p>   
+    </div>
+  </div>
+  <div class="mySlides w3-display-container w3-center" style="position:relative; width:100%; padding-top:43%; overflow:hidden;">
+    <a href="https://www.imdb.com/title/tt7286456/" target="_blank">
+      <img src="https://wallpapers.com/images/featured/joker-2019-pictures-vf5r1qm5ugwdfup3.jpg" style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover;">
+    </a>
+    <div class="w3-display-bottommiddle w3-container w3-text-white w3-padding-32 w3-hide-small" style="position:absolute; bottom:0; width:100%;">
+      <h3>Joker</h3>
+      <p><b>Joker egy 2019-ben bemutatott pszichológiai dráma, amelyet Todd Phillips rendezett, a főszerepben Joaquin Phoenix-szel. 
+        A film Gotham városában játszódik, és Arthur Fleck történetét meséli el – egy mentális problémákkal küzdő, elszigetelt utcai bohócét, 
+        aki fokozatosan sötét, erőszakos átalakuláson megy keresztül, míg végül megszületik belőle a hírhedt Joker. A film a társadalmi kirekesztettség, 
+        a mentális betegségek és az erőszak eredetének súlyos témáit tárgyalja. 
+        Joaquin Phoenix alakítása Oscar-díjat nyert, a film pedig komor hangulata és megrázó realizmusa miatt széles körű kritikai elismerést kapott.</b></p>   
+    </div>
+  </div>
+    <div class="mySlides w3-display-container w3-center" style="position:relative; width:100%; padding-top:43%; overflow:hidden;">
+    <a href="https://www.imdb.com/title/tt0903624/" target="_blank">
+      <img src="https://www.gamechannel.hu/pictures/cinemachannel/a_hobbit__varatlan_utazas_11.jpg" style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover;">
+    </a>
+    <div class="w3-display-bottommiddle w3-container w3-text-white w3-padding-32 w3-hide-small" style="position:absolute; bottom:0; width:100%;">
+      <h3>A Hobbit: Váratan Utazás</h3>
+      <p><b>A hobbit: Váratlan utazás (The Hobbit: An Unexpected Journey) egy 2012-ben bemutatott fantasy-kalandfilm, amelyet Peter Jackson 
+        rendezett J.R.R. Tolkien azonos című regénye alapján. 
+        A film A Gyűrűk Ura-trilógia előzményeként szolgál, és 
+        Bilbó Zsákos (Martin Freeman) történetét meséli el, aki egy nap váratlanul csatlakozik egy törpcsapathoz, élükön Thorin Tölgyfapajzzsal 
+        (Richard Armitage), hogy visszaszerezzék régi otthonukat, Erebor hegységi törpkirályságát a sárkány Smaugtól.
+        Az utazás során Bilbó nemcsak saját bátorságával szembesül, hanem találkozik Gollammal is, akitől megszerzi a titokzatos Egy Gyűrűt. 
+        A film gazdag látványvilágával, epikus tájaival és varázslatos lényeivel egy újabb kalandra hívja nézőit Középfölde világába.</b></p>   
+    </div>
+  </div>
+
+
+  
+  <!-- A Filmek Szekció -->
+  <div class="w3-container w3-content w3-center w3-padding-64" style="max-width:800px" id="movies">
+    <h2 class="w3-wide">FILMEK</h2>
+    <p class="w3-opacity"><i>Fedezd fel a mozi legjobb alkotásait</i></p>
+    <p class="w3-center">Add hozzá a kedvenc filmjeidet, értékeld, képre kattintva nyisd meg az IMDB oldalát! </p>
+    <div class="w3-row w3-padding-32" id="movieContainer"></div>
+
+    <!-- Film hozzáadása gomb -->
+    <div class="w3-center w3-padding">
+      <button class="w3-button w3-green" onclick="openForm()">+ Film hozzáadása</button>
+    </div>
+  </div>
+
+  <!-- Film hozzáadása űrlap -->
+  <div id="movieForm" class="w3-modal">
+    <div class="w3-modal-content w3-animate-top w3-card-4">
+      <header class="w3-container w3-teal"> 
+        <span onclick="closeForm()" class="w3-button w3-display-topright">&times;</span>
+        <h2 id="formTitle">Film hozzáadása</h2>
+      </header>
+      <div class="w3-container">
+        <p><input class="w3-input w3-border" type="text" id="movieTitle" placeholder="Film címe"></p>
+        <p><input class="w3-input w3-border" type="text" id="movieImage" placeholder="Kép URL (pl. https://...)"></p>
+        <p><input class="w3-input w3-border" type="text" id="movieLink" placeholder="IMDb link (pl. https://...)"></p>
+      </div>
+      <footer class="w3-container w3-teal">
+        <button class="w3-button w3-white w3-border" onclick="saveMovie()">Mentés</button>
+      </footer>
+    </div>
+
+    </div>
+  </div>
+
+
+  <!-- Közelgő Filmek Szekció -->
+  <div class="w3-black" id="upcoming">
+    <div class="w3-container w3-content w3-padding-64" style="max-width:800px">
+      <h2 class="w3-wide w3-center">KÖZELGŐ FILMEK</h2>
+      <p class="w3-opacity w3-center"><i>Ne hagyd ki a legújabb megjelenéseket!</i></p><br>
+
+      <ul class="w3-ul w3-border w3-white w3-text-grey" id="upcomingMoviesList">
+        <!-- Dinamikusan feltöltött közelgő filmek itt jelennek meg -->
+      </ul>
+
+      <div class="w3-center w3-padding">
+        <button class="w3-button w3-green" onclick="openUpcomingForm()">+ Film hozzáadása</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Közelgő film hozzáadása űrlap -->
+  <div id="upcomingForm" class="w3-modal">
+    <div class="w3-modal-content w3-animate-top w3-card-4">
+      <header class="w3-container w3-teal"> 
+        <span onclick="closeUpcomingForm()" class="w3-button w3-display-topright">&times;</span>
+        <h2>Új közelgő film hozzáadása</h2>
+      </header>
+      <div class="w3-container">
+        <p><input class="w3-input w3-border" type="text" id="upcomingMovieTitle" placeholder="Film címe"></p>
+        <p><input class="w3-input w3-border" type="date" id="upcomingMovieDate"></p>
+        <p><input class="w3-input w3-border" type="text" id="upcomingMovieLink" placeholder="IMDb link (pl. https://www.imdb.com/title/tt1234567/)"></p>
+      </div>
+      <footer class="w3-container w3-teal">
+        <button class="w3-button w3-white w3-border" onclick="saveUpcomingMovie()">Mentés</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Szereplők szekció -->
+  <div class="w3-container" id="szereplok" style="background-color: #f9f9f9; padding: 80px 0;">
+    <h2 class="w3-center" style="font-size: 2.5em; color: #333;">Híres Szereplők</h2>
+    <p class="w3-opacity w3-center" style="font-size: 1.2em; color: #666;">
+      <i>Kattints egy névre vagy képre a részletekhez</i>
+    </p>
+
+    <div class="w3-row-padding" style="margin-top: 40px;">
+      <div class="w3-third">
+        <div class="circle-img" style="background-image: url('https://sm.ign.com/ign_hu/screenshot/default/robert-downey-jr-vasember-mcu-chaplin-sherlock-holmes-01_xg97.jpg');" 
+            onclick="document.getElementById('rdj-modal').style.display='block'"></div>
+        <h3 onclick="document.getElementById('rdj-modal').style.display='block'" 
+            style="cursor: pointer; margin-top: 20px; font-size: 1.5em; color: #222; transition: color 0.3s;">
+          Robert Downey Jr.
+        </h3>
+      </div>
+      <div class="w3-third">
+        <div class="circle-img" style="background-image: url('https://ujszo.com/sites/default/files/styles/image_16_10_w600/public/lead_image/Britain_Bafta_Film_Awards_2020_Arrival604444679893.jpg.jpg?itok=3yYxaS_m');" 
+            onclick="document.getElementById('scarlett-modal').style.display='block'"></div>
+        <h3 onclick="document.getElementById('scarlett-modal').style.display='block'" 
+            style="cursor: pointer; margin-top: 20px; font-size: 1.5em; color: #222; transition: color 0.3s;">
+          Scarlett Johansson
+        </h3>
+      </div>
+      <div class="w3-third">
+        <div class="circle-img" style="background-image: url('https://media.cnn.com/api/v1/images/stellar/prod/220107041237-andrew-garfield-12122021-restricted.jpg?c=16x9&q=h_833,w_1480,c_fill');" 
+            onclick="document.getElementById('garfield-modal').style.display='block'"></div>
+        <h3 onclick="document.getElementById('garfield-modal').style.display='block'" 
+            style="cursor: pointer; margin-top: 20px; font-size: 1.5em; color: #222; transition: color 0.3s;">
+          Andrew Garfield
+        </h3>
+      </div>
+      <div class="w3-third">
+        <div class="circle-img" style="background-image: url('https://ichef.bbci.co.uk/news/480/cpsprodpb/fe35/live/deb6f940-03d7-11ef-bee9-6125e244a4cd.jpg.webp');" 
+            onclick="document.getElementById('stone-modal').style.display='block'"></div>
+        <h3 onclick="document.getElementById('stone-modal').style.display='block'" 
+            style="cursor: pointer; margin-top: 20px; font-size: 1.5em; color: #222; transition: color 0.3s;">
+          Emma Stone
+        </h3>
+      </div>
+      <div class="w3-third">
+        <div class="circle-img" style="background-image: url('https://www.thenews.com.pk/assets/uploads/updates/2025-02-27/1287092_4152414_jason_updates.jpg');" 
+            onclick="document.getElementById('statham-modal').style.display='block'"></div>
+        <h3 onclick="document.getElementById('statham-modal').style.display='block'" 
+            style="cursor: pointer; margin-top: 20px; font-size: 1.5em; color: #222; transition: color 0.3s;">
+          Jason Statham
+        </h3>
+      </div>
+      <div class="w3-third">
+        <div class="circle-img" style="background-image: url('https://m.media-amazon.com/images/M/MV5BY2M2OWEwNWItZjI5MS00Nzg4LWJmODAtYWRhZmIyMTk4YjdmXkEyXkFqcGc@._V1_.jpg');" 
+            onclick="document.getElementById('qualley-modal').style.display='block'"></div>
+        <h3 onclick="document.getElementById('qualley-modal').style.display='block'" 
+            style="cursor: pointer; margin-top: 20px; font-size: 1.5em; color: #222; transition: color 0.3s;">
+          Margaret Qualley
+        </h3>
+      </div>
+    </div>
+  </div>
+
+  <!-- Robert Downey Jr. Modal -->
+  <div id="rdj-modal" class="w3-modal" onclick="this.style.display='none'">
+    <div class="w3-modal-content w3-animate-zoom w3-card-4 w3-light-grey" style="max-width:600px">
+      <div class="w3-container w3-padding">
+        <span onclick="document.getElementById('rdj-modal').style.display='none'" class="w3-button w3-display-topright">&times;</span>
+        <h2>Robert Downey Jr.</h2>
+        <p><b>Született:</b> 1965. április 4., New York</p>
+        <p><b>Ismert filmek:</b> Vasember, Bosszúállók, Sherlock Holmes</p>
+        <p><b>Rövid életrajz:</b> Downey Jr. az egyik legismertebb hollywoodi színész, aki karrierje során hatalmas visszatérést tett a Marvel Moziverzumban. Szereplései mellett karizmatikus személyiségéről is híres.</p>
+        <p><b>Díjak:</b> Golden Globe, BAFTA, Oscar</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scarlett Johansson Modal -->
+  <div id="scarlett-modal" class="w3-modal" onclick="this.style.display='none'">
+    <div class="w3-modal-content w3-animate-zoom w3-card-4 w3-light-grey" style="max-width:600px">
+      <div class="w3-container w3-padding">
+        <span onclick="document.getElementById('scarlett-modal').style.display='none'" class="w3-button w3-display-topright">&times;</span>
+        <h2>Scarlett Johansson</h2>
+        <p><b>Született:</b> 1984. november 22., New York</p>
+        <p><b>Ismert filmek:</b> Fekete Özvegy, Her, Lucy, Marriage Story</p>
+        <p><b>Rövid életrajz:</b> Az egyik legsikeresebb színésznő Hollywoodban, sokoldalúsága miatt díjnyertes filmekben és kasszasikerekben is rendszeresen szerepel.</p>
+        <p><b>Díjak:</b> BAFTA, Tony, Oscar-jelölés (kétszer egy évben)</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Andrew Garfield Modal -->
+  <div id="garfield-modal" class="w3-modal" onclick="this.style.display='none'">
+    <div class="w3-modal-content w3-animate-zoom w3-card-4 w3-light-grey" style="max-width:600px">
+      <div class="w3-container w3-padding">
+        <span onclick="document.getElementById('garfield-modal').style.display='none'" class="w3-button w3-display-topright">&times;</span>
+        <h2>Andrew Garfield</h2>
+        <p><b>Született:</b> 1983. augusztus 20., Los Angeles, USA</p>
+        <p><b>Ismert filmek:</b> The Social Network, The Amazing Spider-Man, Hacksaw Ridge, Tick, Tick... Boom!</p>
+        <p><b>Rövid életrajz:</b> Andrew Garfield brit-amerikai színész, aki széleskörű karrierjével vált ismertté. Leginkább a Pókember szerepe révén ismert, de szerepelt számos más díjnyertes filmben is, például a "Hacksaw Ridge"-ben, amelyért Oscar-jelölést is kapott.</p>
+        <p><b>Díjak:</b> Golden Globe-díj, BAFTA, Oscar-jelölés</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Emma Stone Modal -->
+  <div id="stone-modal" class="w3-modal" onclick="this.style.display='none'">
+    <div class="w3-modal-content w3-animate-zoom w3-card-4 w3-light-grey" style="max-width:600px">
+      <div class="w3-container w3-padding">
+        <span onclick="document.getElementById('stone-modal').style.display='none'" class="w3-button w3-display-topright">&times;</span>
+        <h2>Emma Stone</h2>
+        <p><b>Született:</b> 1988. november 6., Scottsdale, Arizona, USA</p>
+        <p><b>Ismert filmek:</b> Kaliforgia, Őrült, dilis szerelem, A csodálatos Pókember, La La Land, Poor Things</p>
+        <p><b>Rövid életrajz:</b> Emma Stone kétszeres Oscar-díjas amerikai színésznő, akit sokoldalúságáért és természetes játékáért méltatnak. Karrierje során romantikus vígjátékokban és drámákban is sikereket aratott. A „La La Land” és a „Poor Things” című filmekkel világhírnévre tett szert.</p>
+        <p><b>Díjak:</b> 2× Oscar-díj, Golden Globe, BAFTA, Volpi Cup</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Jason Statham Modal -->
+  <div id="statham-modal" class="w3-modal" onclick="this.style.display='none'">
+    <div class="w3-modal-content w3-animate-zoom w3-card-4 w3-light-grey" style="max-width:600px">
+      <div class="w3-container w3-padding">
+        <span onclick="document.getElementById('statham-modal').style.display='none'" class="w3-button w3-display-topright">&times;</span>
+        <h2>Jason Statham</h2>
+        <p><b>Született:</b> 1967. július 26., Shirebrook, Anglia</p>
+        <p><b>Ismert filmek:</b> A szállító, Blöff, Halálos iramban-filmek, A feláldozhatók, Meg - Az őscápa</p>
+        <p><b>Rövid életrajz:</b> Jason Statham korábbi műugróból lett világhírű akciófilmszínész, akit gyors mozgású harci jelenetei és karizmatikus jelenléte tettek népszerűvé. Gyakran játszik kemény, magabiztos karaktereket.</p>
+        <p><b>Díjak:</b> Nincs Oscar-díja, de világszerte népszerű akciósztár</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Margaret Qualley Modal -->
+  <div id="qualley-modal" class="w3-modal" onclick="this.style.display='none'">
+    <div class="w3-modal-content w3-animate-zoom w3-card-4 w3-light-grey" style="max-width:600px">
+      <div class="w3-container w3-padding">
+        <span onclick="document.getElementById('qualley-modal').style.display='none'" class="w3-button w3-display-topright">&times;</span>
+        <h2>Margaret Qualley</h2>
+        <p><b>Született:</b> 1994. október 23., Kalifornia, USA</p>
+        <p><b>Ismert filmek:</b> *Szer*, *Seesaw Monster*, *Volt egyszer egy Hollywood*, *Fosse/Verdon*</p>
+        <p><b>Rövid életrajz:</b> Margaret Qualley egy tehetséges színésznő, aki kiemelkedett az *Szer* (2023) című filmben, ahol erőteljes és komplex karaktert alakított. Az *Volt egyszer egy Hollywood* (2019) című Tarantino filmben is fontos szerepet játszott, ahol a Manson család tagjaként tűnt fel. A filmben nyújtott alakítása elnyerte a kritikusok tetszését, és több díjat is bezsebelt. Továbbá szerepelt a *Seesaw Monster* és a *Fosse/Verdon* sorozatban, ahol ugyancsak mély és sokoldalú karaktereket formált meg.</p>
+        <p><b>Díjak:</b> Golden Globe jelölés, Emmy-díj jelölés, Critics' Choice Awards jelölés</p>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- Kapcsolat Szekció -->
+  <div class="w3-container" id="contact" style="background-color: #111; color: white; padding: 80px 0;">
+    <h2 class="w3-center" style="font-size: 2.5em; margin-bottom: 40px;">KAPCSOLAT</h2>
+    
+    <div class="contact-container">
+      <!-- Név kártya -->
+      <div class="contact-card">
+        <div class="contact-icon">
+          <i class="fa fa-user"></i>
+        </div>
+        <div class="contact-info">
+          <h3>Név</h3>
+          <p>Bálint László</p>
+        </div>
+      </div>
+
+      <!-- Neptun-kód kártya -->
+      <div class="contact-card">
+        <div class="contact-icon">
+          <i class="fa fa-graduation-cap"></i>
+        </div>
+        <div class="contact-info">
+          <h3>Neptun-kód</h3>
+          <p>QW9LIU</p>
+        </div>
+      </div>
+
+      <!-- Email kártya -->
+      <div class="contact-card">
+        <div class="contact-icon">
+          <i class="fa fa-envelope"></i>
+        </div>
+        <div class="contact-info">
+          <h3>Email</h3>
+          <a href="mailto:laciha12@gmail.com">laciha12@gmail.com</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!-- Oldal tartalmának vége -->
+</div>
+
+<!-- Lábléc -->
+<footer class="w3-container w3-padding-64 w3-center w3-opacity w3-light-grey w3-xlarge">
+  <i class="fa fa-facebook-official w3-hover-opacity"></i>
+  <i class="fa fa-instagram w3-hover-opacity"></i>
+  <i class="fa fa-twitter w3-hover-opacity"></i>
+  <p class="w3-medium">Powered by <a href="https://www.w3schools.com/w3css/default.asp" target="_blank">w3.css</a></p>
+</footer>
+
+<script>
+  var slideIndex = 0;
+  showSlides();
+
+  function showSlides() {
+    var slides = document.getElementsByClassName("mySlides");
+    for (var i = 0; i < slides.length; i++) {
+      slides[i].style.display = "none";  
+    }
+    slideIndex++;
+    if (slideIndex > slides.length) {slideIndex = 1}    
+    slides[slideIndex-1].style.display = "block";  
+    setTimeout(showSlides, 5000); 
+  }
+
+  // Közelgő filmek tárolása
+  function saveUpcomingMovie() {
+    const title = document.getElementById("upcomingMovieTitle").value;
+    const date = document.getElementById("upcomingMovieDate").value;
+    const link = document.getElementById("upcomingMovieLink").value;
+
+    if (title && date) {
+      const movie = { title, date, link: link || '#' }; // # ha nincs link
+      let upcomingMovies = JSON.parse(localStorage.getItem("upcomingMovies")) || [];
+      upcomingMovies.push(movie);
+      localStorage.setItem("upcomingMovies", JSON.stringify(upcomingMovies));
+
+      closeUpcomingForm();
+      displayUpcomingMovies();
+    }
+  }
+
+  // Közelgő filmek megjelenítése
+  function displayUpcomingMovies() {
+    const upcomingMoviesList = document.getElementById("upcomingMoviesList");
+    upcomingMoviesList.innerHTML = '';
+
+    const upcomingMovies = JSON.parse(localStorage.getItem("upcomingMovies")) || [];
+    
+    upcomingMovies.forEach((movie, index) => {
+      const movieItem = document.createElement("li");
+      movieItem.classList.add("w3-padding");
+      movieItem.innerHTML = `
+        <div class="upcoming-movie-content">
+          <a href="${movie.link || '#'}" target="_blank" class="upcoming-movie-title">
+            ${movie.title}
+          </a>
+          <div class="upcoming-movie-actions">
+            <span class="w3-badge">${movie.date}</span>
+            <button class="w3-button w3-red" onclick="deleteUpcomingMovie(${index})">Törlés</button>
+          </div>
+        </div>
+      `;
+      upcomingMoviesList.appendChild(movieItem);
+    });
+  }
+
+  // Közelgő film törlése
+  function deleteUpcomingMovie(index) {
+    let upcomingMovies = JSON.parse(localStorage.getItem("upcomingMovies")) || [];
+    upcomingMovies.splice(index, 1);
+    localStorage.setItem("upcomingMovies", JSON.stringify(upcomingMovies));
+    displayUpcomingMovies();
+  }
+
+  // Modal űrlap megnyitása
+  function openUpcomingForm() {
+    document.getElementById("upcomingForm").style.display = "block";
+  }
+
+  // Modal űrlap bezárása
+  function closeUpcomingForm() {
+    document.getElementById("upcomingForm").style.display = "none";
+  }
+
+  // Filmek tárolása a localStorage-ban
+  function saveMovie() {
+    const title = document.getElementById("movieTitle").value;
+    const image = document.getElementById("movieImage").value;
+    const link = document.getElementById("movieLink").value;
+
+    // Validálás
+    if (title && image && link) {
+      const movie = { title, image, link };
+      let movies = JSON.parse(localStorage.getItem("movies")) || [];
+      movies.push(movie);
+      localStorage.setItem("movies", JSON.stringify(movies));
+
+      // Űrlap bezárása
+      closeForm();
+      displayMovies();
+    }
+  }
+
+  // Filmek megjelenítése
+  function displayMovies() {
+      const movieContainer = document.getElementById("movieContainer");
+      movieContainer.innerHTML = '';  // Korábbi filmek törlése
+
+      const movies = JSON.parse(localStorage.getItem("movies")) || [];
+      
+      movies.forEach((movie, index) => {
+          const movieDiv = document.createElement("div");
+          movieDiv.classList.add("movie-card");
+          movieDiv.innerHTML = `
+              <div class="movie-poster-container">
+                  <a href="${movie.link}" target="_blank">
+                      <img src="${movie.image}" class="movie-poster" alt="${movie.title}">
+                  </a>
+              </div>
+              <div class="movie-title">${movie.title}</div>
+              <div class="rating" data-movie-index="${index}">
+                  <span class="rating-star" data-value="1">★</span>
+                  <span class="rating-star" data-value="2">★</span>
+                  <span class="rating-star" data-value="3">★</span>
+                  <span class="rating-star" data-value="4">★</span>
+                  <span class="rating-star" data-value="5">★</span>
+              </div>
+              <div class="w3-center">
+                  <button class="w3-button w3-red" onclick="deleteMovie(${index})">Törlés</button>
+              </div>
+          `;
+          movieContainer.appendChild(movieDiv);
+          
+          // Beállítjuk a mentett értékelést, ha van
+          const savedRating = getMovieRating(index);
+          if (savedRating) {
+              setRating(movieDiv.querySelector('.rating'), savedRating);
+          }
+      });
+      
+      // Eseményfigyelők hozzáadása a csillagokhoz
+      document.querySelectorAll('.rating-star').forEach(star => {
+          star.addEventListener('click', function() {
+              const ratingContainer = this.parentElement;
+              const value = parseInt(this.getAttribute('data-value'));
+              const movieIndex = parseInt(ratingContainer.getAttribute('data-movie-index'));
+              
+              // Csillagok frissítése
+              setRating(ratingContainer, value);
+              
+              // Értékelés mentése
+              saveMovieRating(movieIndex, value);
+          });
+      });
+  }
+
+  // Film értékelésének mentése
+  function saveMovieRating(movieIndex, rating) {
+      let ratings = JSON.parse(localStorage.getItem("movieRatings")) || {};
+      ratings[movieIndex] = rating;
+      localStorage.setItem("movieRatings", JSON.stringify(ratings));
+  }
+
+  // Film értékelésének lekérése
+  function getMovieRating(movieIndex) {
+      const ratings = JSON.parse(localStorage.getItem("movieRatings")) || {};
+      return ratings[movieIndex];
+  }
+
+  // Csillagok megjelenítése a kiválasztott értékelés szerint
+  function setRating(ratingContainer, value) {
+      const stars = ratingContainer.querySelectorAll('.rating-star');
+      stars.forEach(star => {
+          const starValue = parseInt(star.getAttribute('data-value'));
+          if (starValue <= value) {
+              star.classList.add('active');
+          } else {
+              star.classList.remove('active');
+          }
+      });
+  }
+
+  // Film törlése
+  function deleteMovie(index) {
+    let movies = JSON.parse(localStorage.getItem("movies")) || [];
+    movies.splice(index, 1);
+    localStorage.setItem("movies", JSON.stringify(movies));
+    
+    // Értékelés törlése is
+    let ratings = JSON.parse(localStorage.getItem("movieRatings")) || {};
+    delete ratings[index];
+    localStorage.setItem("movieRatings", JSON.stringify(ratings));
+    
+    displayMovies();
+  }
+
+  // Modal űrlap megnyitása
+  function openForm() {
+    document.getElementById("movieForm").style.display = "block";
+  }
+
+  // Modal űrlap bezárása
+  function closeForm() {
+    document.getElementById("movieForm").style.display = "none";
+  }
+
+  // Az oldal betöltésekor mindkét megjelenítő függvény meghívása
+  window.onload = function() {
+    displayMovies();
+    displayUpcomingMovies();
+  };
+</script>
+
+</body>
+</html>
