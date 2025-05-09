@@ -847,81 +847,122 @@
   }
 
   // Filmek tárolása a localStorage-ban
+  // Film hozzáadása és mentése
   function saveMovie() {
-    const title = document.getElementById("movieTitle").value;
-    const image = document.getElementById("movieImage").value;
-    const link = document.getElementById("movieLink").value;
-    const genre = document.getElementById("movieGenre").value || "action";
+      const title = document.getElementById("movieTitle").value;
+      const image = document.getElementById("movieImage").value;
+      const link = document.getElementById("movieLink").value;
+      const genre = document.getElementById("movieGenre").value || "action";
 
-    if (title && image && link) {
-      const movie = { 
-        title, 
-        image, 
-        link,
-        genre
-      };
-      let movies = JSON.parse(localStorage.getItem("movies")) || [];
-      movies.push(movie);
-      localStorage.setItem("movies", JSON.stringify(movies));
-
-      closeForm();
-      
-      // Aktív rendezési sorrend meghatározása és alkalmazása
-      const activeSortBtn = document.querySelector('.sort-btn.active');
-      const sortOrder = activeSortBtn ? 
-        (activeSortBtn.getAttribute('onclick').includes("'asc'") ? 'asc' : 'desc') : 
-        'asc';
-      sortMovies(sortOrder);
-    }
+      if (title && image && link) {
+          const movie = { 
+              title, 
+              image, 
+              link,
+              genre,
+              rating: 0 // Alapértelmezett értékelés
+          };
+          
+          // Meglévő filmek betöltése
+          let movies = JSON.parse(localStorage.getItem("movies")) || [];
+          
+          // Új film hozzáadása
+          movies.push(movie);
+          
+          // Filmek mentése
+          localStorage.setItem("movies", JSON.stringify(movies));
+          
+          // Űrlap bezárása
+          closeForm();
+          
+          // Aktív rendezés meghatározása és alkalmazása
+          const activeSortBtn = document.querySelector('.sort-btn.active');
+          const sortOrder = activeSortBtn ? 
+              (activeSortBtn.getAttribute('onclick').includes("'asc'") ? 'asc' : 'desc') : 
+              'asc';
+          
+          // Filmek újramegjelenítése a megfelelő sorrendben
+          displayMovies();
+          
+          // Rendezés alkalmazása
+          sortMovies(sortOrder);
+      } else {
+          alert("Kérlek töltsd ki minden mezőt!");
+      }
   }
 
-  // Filmek megjelenítése
-  function displayMovies() {
-    const movieContainer = document.getElementById("movieContainer");
-    movieContainer.innerHTML = '';
-
-    const movies = JSON.parse(localStorage.getItem("movies")) || [];
-    
-    movies.forEach((movie, index) => {
-      const movieDiv = document.createElement("div");
-      movieDiv.classList.add("movie-card");
-      movieDiv.innerHTML = `
-        <div class="movie-poster-container">
-          <a href="${movie.link}" target="_blank">
-            <img src="${movie.image}" class="movie-poster" alt="${movie.title}">
-          </a>
-        </div>
-        <div class="movie-title">${movie.title}</div>
-        <div class="w3-small w3-center">${getGenreName(movie.genre)}</div>
-        <div class="rating" data-movie-index="${index}">
-          <span class="rating-star" data-value="1">★</span>
-          <span class="rating-star" data-value="2">★</span>
-          <span class="rating-star" data-value="3">★</span>
-          <span class="rating-star" data-value="4">★</span>
-          <span class="rating-star" data-value="5">★</span>
-        </div>
-        <div class="w3-center">
-          <button class="w3-button w3-red" onclick="deleteMovie(${index})">Törlés</button>
-        </div>
-      `;
-      movieContainer.appendChild(movieDiv);
+  // Módosított rendezési függvény
+  function sortMovies(order) {
+      let movies = JSON.parse(localStorage.getItem("movies")) || [];
       
-      const savedRating = getMovieRating(index);
-      if (savedRating) {
-        setRating(movieDiv.querySelector('.rating'), savedRating);
-      }
-    });
-    
-    document.querySelectorAll('.rating-star').forEach(star => {
-      star.addEventListener('click', function() {
-        const ratingContainer = this.parentElement;
-        const value = parseInt(this.getAttribute('data-value'));
-        const movieIndex = parseInt(ratingContainer.getAttribute('data-movie-index'));
-        
-        setRating(ratingContainer, value);
-        saveMovieRating(movieIndex, value);
+      movies.sort((a, b) => {
+          const titleA = a.title.toLowerCase();
+          const titleB = b.title.toLowerCase();
+          return order === 'asc' 
+              ? titleA.localeCompare(titleB, 'hu')
+              : titleB.localeCompare(titleA, 'hu');
       });
-    });
+
+      localStorage.setItem("movies", JSON.stringify(movies));
+      displayMovies();
+      
+      // Rendezési gombok frissítése
+      document.querySelectorAll('.sort-btn').forEach(btn => {
+          btn.classList.remove('active');
+          if (btn.getAttribute('onclick').includes(`'${order}'`)) {
+              btn.classList.add('active');
+          }
+      });
+  }
+
+  // Módosított megjelenítési függvény
+  function displayMovies() {
+      const movieContainer = document.getElementById("movieContainer");
+      movieContainer.innerHTML = '';
+
+      const movies = JSON.parse(localStorage.getItem("movies")) || [];
+      
+      movies.forEach((movie, index) => {
+          const movieDiv = document.createElement("div");
+          movieDiv.classList.add("movie-card");
+          movieDiv.innerHTML = `
+              <div class="movie-poster-container">
+                  <a href="${movie.link}" target="_blank">
+                      <img src="${movie.image}" class="movie-poster" alt="${movie.title}">
+                  </a>
+              </div>
+              <div class="movie-title">${movie.title}</div>
+              <div class="w3-small w3-center">${getGenreName(movie.genre)}</div>
+              <div class="rating" data-movie-index="${index}">
+                  <span class="rating-star" data-value="1">★</span>
+                  <span class="rating-star" data-value="2">★</span>
+                  <span class="rating-star" data-value="3">★</span>
+                  <span class="rating-star" data-value="4">★</span>
+                  <span class="rating-star" data-value="5">★</span>
+              </div>
+              <div class="w3-center">
+                  <button class="w3-button w3-red" onclick="deleteMovie(${index})">Törlés</button>
+              </div>
+          `;
+          movieContainer.appendChild(movieDiv);
+          
+          // Értékelés beállítása, ha van
+          if (movie.rating) {
+              setRating(movieDiv.querySelector('.rating'), movie.rating);
+          }
+      });
+      
+      // Eseményfigyelők hozzáadása a csillagokhoz
+      document.querySelectorAll('.rating-star').forEach(star => {
+          star.addEventListener('click', function() {
+              const ratingContainer = this.parentElement;
+              const value = parseInt(this.getAttribute('data-value'));
+              const movieIndex = parseInt(ratingContainer.getAttribute('data-movie-index'));
+              
+              setRating(ratingContainer, value);
+              saveMovieRating(movieIndex, value);
+          });
+      });
   }
 
   // Film szűrése kategória szerint
@@ -1001,9 +1042,11 @@
 
   // Film értékelésének mentése
   function saveMovieRating(movieIndex, rating) {
-    let ratings = JSON.parse(localStorage.getItem("movieRatings")) || {};
-    ratings[movieIndex] = rating;
-    localStorage.setItem("movieRatings", JSON.stringify(ratings));
+      let movies = JSON.parse(localStorage.getItem("movies")) || [];
+      if (movies[movieIndex]) {
+          movies[movieIndex].rating = rating;
+          localStorage.setItem("movies", JSON.stringify(movies));
+      }
   }
 
   // Film értékelésének lekérése
@@ -1027,15 +1070,10 @@
 
   // Film törlése
   function deleteMovie(index) {
-    let movies = JSON.parse(localStorage.getItem("movies")) || [];
-    movies.splice(index, 1);
-    localStorage.setItem("movies", JSON.stringify(movies));
-    
-    let ratings = JSON.parse(localStorage.getItem("movieRatings")) || {};
-    delete ratings[index];
-    localStorage.setItem("movieRatings", JSON.stringify(ratings));
-    
-    displayMovies();
+      let movies = JSON.parse(localStorage.getItem("movies")) || [];
+      movies.splice(index, 1);
+      localStorage.setItem("movies", JSON.stringify(movies));
+      displayMovies();
   }
 
   // Modal űrlap megnyitása (film hozzáadása)
@@ -1057,12 +1095,12 @@
 
   // Az oldal betöltésekor mindkét megjelenítő függvény meghívása
   window.onload = function() {
-    displayMovies();
-    displayUpcomingMovies();
-    document.querySelector('.filter-btn').click();
-    setupSortButtons();
-    // Alapértelmezett rendezés beállítása
-    sortMovies('asc');
+      // Alapértelmezett rendezés beállítása
+      sortMovies('asc');
+      // Filmek megjelenítése
+      displayMovies();
+      // Alapértelmezett szűrés beállítása
+      document.querySelector('.filter-btn').click();
   };
   // Rendezés
   function sortMovies(order) {
