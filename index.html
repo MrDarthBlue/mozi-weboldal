@@ -304,6 +304,23 @@
         color: #ff6b6b;
         text-decoration: underline;
     }
+    /* Szűrő gombok stílusa */
+    .filter-btn {
+      margin: 0 5px;
+      transition: all 0.3s;
+      border-radius: 4px;
+    }
+
+    .filter-btn:hover {
+      background-color: #f44336 !important;
+      color: white !important;
+    }
+
+    .filter-btn.active {
+      background-color: #f44336 !important;
+      color: white !important;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
 </style>
 </head>
 
@@ -388,6 +405,28 @@
   <div class="w3-container w3-content w3-center w3-padding-64" style="max-width:800px" id="movies">
     <h2 class="w3-wide">FILMEK</h2>
     <p class="w3-opacity"><i>Fedezd fel a mozi legjobb alkotásait</i></p>
+    
+    <!-- Szűrő gombok hozzáadása -->
+    <div class="w3-bar w3-margin-bottom">
+      <button class="w3-button w3-black filter-btn active" onclick="filterMovies('all')">Összes</button>
+      <button class="w3-button w3-black filter-btn" onclick="filterMovies('action')">Akció</button>
+      <button class="w3-button w3-black filter-btn" onclick="filterMovies('adventure')">Kaland</button>
+      <button class="w3-button w3-black filter-btn" onclick="filterMovies('comedy')">Vígjáték</button>
+      <button class="w3-button w3-black filter-btn" onclick="filterMovies('drama')">Dráma</button>
+      <button class="w3-button w3-black filter-btn" onclick="filterMovies('fantasy')">Fantasy</button>
+      <button class="w3-button w3-black filter-btn" onclick="filterMovies('horror')">Horror</button>
+      <button class="w3-button w3-black filter-btn" onclick="filterMovies('sci-fi')">Sci-Fi</button>
+      <button class="w3-button w3-black filter-btn" onclick="filterMovies('thriller')">Thriller</button>
+      <button class="w3-button w3-black filter-btn" onclick="filterMovies('romance')">Romantikus</button>
+      <button class="w3-button w3-black filter-btn" onclick="filterMovies('documentary')">Dokumentum</button>
+      <button class="w3-button w3-black filter-btn" onclick="filterMovies('animation')">Animáció</button>
+      <button class="w3-button w3-black filter-btn" onclick="filterMovies('crime')">Bűnügyi</button>
+      <button class="w3-button w3-black filter-btn" onclick="filterMovies('family')">Családi</button>
+      <button class="w3-button w3-black filter-btn" onclick="filterMovies('musical')">Musical</button>
+      <button class="w3-button w3-black filter-btn" onclick="filterMovies('mystery')">Rejtély</button>
+      <button class="w3-button w3-black filter-btn" onclick="filterMovies('historical')">Történelmi</button>
+    </div>
+    
     <p class="w3-center">Add hozzá a kedvenc filmjeidet, értékeld, képre kattintva nyisd meg az IMDB oldalát! </p>
     <div class="w3-row w3-padding-32" id="movieContainer"></div>
 
@@ -408,12 +447,32 @@
         <p><input class="w3-input w3-border" type="text" id="movieTitle" placeholder="Film címe"></p>
         <p><input class="w3-input w3-border" type="text" id="movieImage" placeholder="Kép URL (pl. https://...)"></p>
         <p><input class="w3-input w3-border" type="text" id="movieLink" placeholder="IMDb link (pl. https://...)"></p>
+        <p>
+          <select class="w3-select w3-border" id="movieGenre">
+            <option value="action" selected>Akció</option>
+            <option value="adventure">Kaland</option>
+            <option value="animation">Animáció</option>
+            <option value="comedy">Vígjáték</option>
+            <option value="crime">Bűnügyi</option>
+            <option value="documentary">Dokumentum</option>
+            <option value="drama">Dráma</option>
+            <option value="family">Családi</option>
+            <option value="fantasy">Fantasy</option>
+            <option value="historical">Történelmi</option>
+            <option value="horror">Horror</option>
+            <option value="musical">Musical</option>
+            <option value="mystery">Rejtély</option>
+            <option value="romance">Romantikus</option>
+            <option value="sci-fi">Sci-Fi</option>
+            <option value="thriller">Thriller</option>
+            <option value="war">Háborús</option>
+            <option value="western">Western</option>
+          </select>
+        </p>
       </div>
       <footer class="w3-container w3-teal">
         <button class="w3-button w3-white w3-border" onclick="saveMovie()">Mentés</button>
       </footer>
-    </div>
-
     </div>
   </div>
 
@@ -670,7 +729,7 @@
     const link = document.getElementById("upcomingMovieLink").value;
 
     if (title && date) {
-      const movie = { title, date, link: link || '#' }; // # ha nincs link
+      const movie = { title, date, link: link || '#' };
       let upcomingMovies = JSON.parse(localStorage.getItem("upcomingMovies")) || [];
       upcomingMovies.push(movie);
       localStorage.setItem("upcomingMovies", JSON.stringify(upcomingMovies));
@@ -728,15 +787,19 @@
     const title = document.getElementById("movieTitle").value;
     const image = document.getElementById("movieImage").value;
     const link = document.getElementById("movieLink").value;
+    const genre = document.getElementById("movieGenre").value || "action";
 
-    // Validálás
     if (title && image && link) {
-      const movie = { title, image, link };
+      const movie = { 
+        title, 
+        image, 
+        link,
+        genre
+      };
       let movies = JSON.parse(localStorage.getItem("movies")) || [];
       movies.push(movie);
       localStorage.setItem("movies", JSON.stringify(movies));
 
-      // Űrlap bezárása
       closeForm();
       displayMovies();
     }
@@ -744,81 +807,149 @@
 
   // Filmek megjelenítése
   function displayMovies() {
-      const movieContainer = document.getElementById("movieContainer");
-      movieContainer.innerHTML = '';  // Korábbi filmek törlése
+    const movieContainer = document.getElementById("movieContainer");
+    movieContainer.innerHTML = '';
 
-      const movies = JSON.parse(localStorage.getItem("movies")) || [];
+    const movies = JSON.parse(localStorage.getItem("movies")) || [];
+    
+    movies.forEach((movie, index) => {
+      const movieDiv = document.createElement("div");
+      movieDiv.classList.add("movie-card");
+      movieDiv.innerHTML = `
+        <div class="movie-poster-container">
+          <a href="${movie.link}" target="_blank">
+            <img src="${movie.image}" class="movie-poster" alt="${movie.title}">
+          </a>
+        </div>
+        <div class="movie-title">${movie.title}</div>
+        <div class="w3-small w3-center">${getGenreName(movie.genre)}</div>
+        <div class="rating" data-movie-index="${index}">
+          <span class="rating-star" data-value="1">★</span>
+          <span class="rating-star" data-value="2">★</span>
+          <span class="rating-star" data-value="3">★</span>
+          <span class="rating-star" data-value="4">★</span>
+          <span class="rating-star" data-value="5">★</span>
+        </div>
+        <div class="w3-center">
+          <button class="w3-button w3-red" onclick="deleteMovie(${index})">Törlés</button>
+        </div>
+      `;
+      movieContainer.appendChild(movieDiv);
       
-      movies.forEach((movie, index) => {
-          const movieDiv = document.createElement("div");
-          movieDiv.classList.add("movie-card");
-          movieDiv.innerHTML = `
-              <div class="movie-poster-container">
-                  <a href="${movie.link}" target="_blank">
-                      <img src="${movie.image}" class="movie-poster" alt="${movie.title}">
-                  </a>
-              </div>
-              <div class="movie-title">${movie.title}</div>
-              <div class="rating" data-movie-index="${index}">
-                  <span class="rating-star" data-value="1">★</span>
-                  <span class="rating-star" data-value="2">★</span>
-                  <span class="rating-star" data-value="3">★</span>
-                  <span class="rating-star" data-value="4">★</span>
-                  <span class="rating-star" data-value="5">★</span>
-              </div>
-              <div class="w3-center">
-                  <button class="w3-button w3-red" onclick="deleteMovie(${index})">Törlés</button>
-              </div>
-          `;
-          movieContainer.appendChild(movieDiv);
-          
-          // Beállítjuk a mentett értékelést, ha van
-          const savedRating = getMovieRating(index);
-          if (savedRating) {
-              setRating(movieDiv.querySelector('.rating'), savedRating);
-          }
+      const savedRating = getMovieRating(index);
+      if (savedRating) {
+        setRating(movieDiv.querySelector('.rating'), savedRating);
+      }
+    });
+    
+    document.querySelectorAll('.rating-star').forEach(star => {
+      star.addEventListener('click', function() {
+        const ratingContainer = this.parentElement;
+        const value = parseInt(this.getAttribute('data-value'));
+        const movieIndex = parseInt(ratingContainer.getAttribute('data-movie-index'));
+        
+        setRating(ratingContainer, value);
+        saveMovieRating(movieIndex, value);
       });
-      
-      // Eseményfigyelők hozzáadása a csillagokhoz
-      document.querySelectorAll('.rating-star').forEach(star => {
-          star.addEventListener('click', function() {
-              const ratingContainer = this.parentElement;
-              const value = parseInt(this.getAttribute('data-value'));
-              const movieIndex = parseInt(ratingContainer.getAttribute('data-movie-index'));
-              
-              // Csillagok frissítése
-              setRating(ratingContainer, value);
-              
-              // Értékelés mentése
-              saveMovieRating(movieIndex, value);
-          });
-      });
+    });
+  }
+
+  // Film szűrése kategória szerint
+  function filterMovies(genre) {
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.classList.remove('active');
+      if (btn.textContent.toLowerCase() === genre || 
+          (genre === 'all' && btn.textContent === 'Összes')) {
+        btn.classList.add('active');
+      }
+    });
+
+    const movies = JSON.parse(localStorage.getItem("movies")) || [];
+    const movieContainer = document.getElementById("movieContainer");
+    movieContainer.innerHTML = '';
+
+    movies.forEach((movie, index) => {
+      if (genre === 'all' || movie.genre === genre) {
+        const movieDiv = document.createElement("div");
+        movieDiv.classList.add("movie-card");
+        movieDiv.innerHTML = `
+          <div class="movie-poster-container">
+            <a href="${movie.link}" target="_blank">
+              <img src="${movie.image}" class="movie-poster" alt="${movie.title}">
+            </a>
+          </div>
+          <div class="movie-title">${movie.title}</div>
+          <div class="w3-small w3-center">${getGenreName(movie.genre)}</div>
+          <div class="rating" data-movie-index="${index}">
+            <span class="rating-star" data-value="1">★</span>
+            <span class="rating-star" data-value="2">★</span>
+            <span class="rating-star" data-value="3">★</span>
+            <span class="rating-star" data-value="4">★</span>
+            <span class="rating-star" data-value="5">★</span>
+          </div>
+          <div class="w3-center">
+            <button class="w3-button w3-red" onclick="deleteMovie(${index})">Törlés</button>
+          </div>
+        `;
+        movieContainer.appendChild(movieDiv);
+        
+        const savedRating = getMovieRating(index);
+        if (savedRating) {
+          setRating(movieDiv.querySelector('.rating'), savedRating);
+        }
+      }
+    });
+  }
+
+  // Kategória nevének lekérdezése
+  function getGenreName(genre) {
+    const genres = {
+      'action': 'Akció',
+      'adventure': 'Kaland',
+      'animation': 'Animáció',
+      'comedy': 'Vígjáték',
+      'crime': 'Bűnügyi',
+      'documentary': 'Dokumentum',
+      'drama': 'Dráma',
+      'family': 'Családi',
+      'fantasy': 'Fantasy',
+      'historical': 'Történelmi',
+      'horror': 'Horror',
+      'musical': 'Musical',
+      'mystery': 'Rejtély',
+      'romance': 'Romantikus',
+      'sci-fi': 'Sci-Fi',
+      'thriller': 'Thriller',
+      'war': 'Háborús',
+      'western': 'Western'
+    };
+    return genres[genre] || genre;
   }
 
   // Film értékelésének mentése
   function saveMovieRating(movieIndex, rating) {
-      let ratings = JSON.parse(localStorage.getItem("movieRatings")) || {};
-      ratings[movieIndex] = rating;
-      localStorage.setItem("movieRatings", JSON.stringify(ratings));
+    let ratings = JSON.parse(localStorage.getItem("movieRatings")) || {};
+    ratings[movieIndex] = rating;
+    localStorage.setItem("movieRatings", JSON.stringify(ratings));
   }
 
   // Film értékelésének lekérése
   function getMovieRating(movieIndex) {
-      const ratings = JSON.parse(localStorage.getItem("movieRatings")) || {};
-      return ratings[movieIndex];
+    const ratings = JSON.parse(localStorage.getItem("movieRatings")) || {};
+    return ratings[movieIndex];
   }
 
   // Csillagok megjelenítése a kiválasztott értékelés szerint
   function setRating(ratingContainer, value) {
-      const stars = ratingContainer.querySelectorAll('.rating-star');
-      stars.forEach(star => {
-          const starValue = parseInt(star.getAttribute('data-value'));
-          if (starValue <= value) {
-              star.classList.add('active');
-          } else {
-              star.classList.remove('active');
-          }
-      });
+    const stars = ratingContainer.querySelectorAll('.rating-star');
+    stars.forEach(star => {
+      const starValue = parseInt(star.getAttribute('data-value'));
+      if (starValue <= value) {
+        star.classList.add('active');
+      } else {
+        star.classList.remove('active');
+      }
+    });
   }
 
   // Film törlése
@@ -827,7 +958,6 @@
     movies.splice(index, 1);
     localStorage.setItem("movies", JSON.stringify(movies));
     
-    // Értékelés törlése is
     let ratings = JSON.parse(localStorage.getItem("movieRatings")) || {};
     delete ratings[index];
     localStorage.setItem("movieRatings", JSON.stringify(ratings));
@@ -849,6 +979,8 @@
   window.onload = function() {
     displayMovies();
     displayUpcomingMovies();
+    // Alapértelmezetten az "Összes" gomb aktív
+    document.querySelector('.filter-btn').click();
   };
 </script>
 
