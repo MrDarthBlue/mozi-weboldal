@@ -865,7 +865,13 @@
       localStorage.setItem("movies", JSON.stringify(movies));
 
       closeForm();
-      displayMovies();
+      
+      // Aktív rendezési sorrend meghatározása és alkalmazása
+      const activeSortBtn = document.querySelector('.sort-btn.active');
+      const sortOrder = activeSortBtn ? 
+        (activeSortBtn.getAttribute('onclick').includes("'asc'") ? 'asc' : 'desc') : 
+        'asc';
+      sortMovies(sortOrder);
     }
   }
 
@@ -1053,9 +1059,9 @@
   window.onload = function() {
     displayMovies();
     displayUpcomingMovies();
-    // Alapértelmezetten az "Összes" gomb aktív
     document.querySelector('.filter-btn').click();
-    // Alapértelmezett rendezés
+    setupSortButtons();
+    // Alapértelmezett rendezés beállítása
     sortMovies('asc');
   };
   // Rendezés
@@ -1088,7 +1094,15 @@
       }
     });
   }
-  
+  // Rendezési gombok kezelése
+  function setupSortButtons() {
+    document.querySelectorAll('.sort-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const order = this.getAttribute('onclick').includes("'asc'") ? 'asc' : 'desc';
+        sortMovies(order);
+      });
+    });
+  }
 
 </script>
 
