@@ -8,7 +8,7 @@ body {font-family: "Lato", sans-serif}
         to {opacity: 1}
     }
 
-    /* Slide szövegek stílusai - jobb láthatóság asdasd */
+    /* Slide szövegek stílusai */
     .w3-display-bottommiddle.w3-container {
         background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.5) 100%);
         padding: 2vw 4vw;
@@ -109,7 +109,6 @@ body {font-family: "Lato", sans-serif}
         font-weight: bold;
     }
     
-    /* A film container flex layoutra állítása */
     #movieContainer {
         display: flex;
         flex-wrap: wrap;
